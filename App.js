@@ -3,7 +3,6 @@ import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, onSnapshot, doc, updateDoc, addDoc, query, orderBy } from 'firebase/firestore';
 
 // --- Firebase Configuration ---
-// This now correctly reads the environment variables you set in Netlify
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_API_KEY,
   authDomain: process.env.REACT_APP_AUTH_DOMAIN,
@@ -14,14 +13,12 @@ const firebaseConfig = {
 };
 
 // --- Initialize Firebase ---
-// We add a check to ensure config values are present before initializing
 let app;
-let db; // Declare db here
+let db;
 
-// Only initialize Firebase and Firestore if the API key exists
 if (firebaseConfig.apiKey) {
   app = initializeApp(firebaseConfig);
-  db = getFirestore(app); // Initialize db only if app is initialized
+  db = getFirestore(app);
 }
 
 // --- Main App Component ---
@@ -29,9 +26,7 @@ export default function App() {
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // --- Fetches vehicle data from Firestore in real-time ---
   useEffect(() => {
-    // Only run if Firebase was initialized (db will be defined)
     if (!db) {
         setLoading(false);
         return;
@@ -50,11 +45,9 @@ export default function App() {
         setLoading(false);
     });
 
-    // Cleanup subscription on unmount
     return () => unsubscribe();
   }, []);
 
-  // --- Render a message if Firebase is not configured ---
   if (!db) {
       return (
           <div style={styles.errorContainer}>
@@ -101,7 +94,6 @@ const VehicleCard = ({ vehicle }) => {
     "Quality Check", "Final Wash & Vacuum", "Ready for Collection", "Invoiced & Completed"
   ];
 
-  // --- Updates the vehicle's status in Firestore ---
   const handleStatusChange = async (e) => {
     const newStatus = e.target.value;
     const vehicleRef = doc(db, "vehicles", vehicle.id);
@@ -153,11 +145,10 @@ const AddVehicleForm = () => {
                 make,
                 model,
                 registration,
-                status: "Booked In", // Default status
-                serviceAdvisor: "Busi", // Example advisor
+                status: "Booked In",
+                serviceAdvisor: "Busi",
                 estimatedCompletionTime: "Not set"
             });
-            // Clear form
             setCustomerName('');
             setMake('');
             setModel('');
@@ -179,7 +170,6 @@ const AddVehicleForm = () => {
     );
 };
 
-
 // --- Basic Styling ---
 const styles = {
   container: { fontFamily: 'sans-serif', padding: '20px', backgroundColor: '#f4f7fa' },
@@ -194,3 +184,4 @@ const styles = {
   input: { display: 'block', width: 'calc(100% - 20px)', padding: '10px', margin: '10px 0', borderRadius: '4px', border: '1px solid #ccc' },
   button: { padding: '10px 20px', backgroundColor: '#d92d27', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '16px' }
 };
+
