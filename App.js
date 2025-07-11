@@ -16,10 +16,13 @@ const firebaseConfig = {
 // --- Initialize Firebase ---
 // We add a check to ensure config values are present before initializing
 let app;
+let db; // Declare db here
+
+// Only initialize Firebase and Firestore if the API key exists
 if (firebaseConfig.apiKey) {
   app = initializeApp(firebaseConfig);
+  db = getFirestore(app); // Initialize db only if app is initialized
 }
-const db = getFirestore(app);
 
 // --- Main App Component ---
 export default function App() {
@@ -28,8 +31,8 @@ export default function App() {
 
   // --- Fetches vehicle data from Firestore in real-time ---
   useEffect(() => {
-    // Only run if Firebase was initialized
-    if (!app) {
+    // Only run if Firebase was initialized (db will be defined)
+    if (!db) {
         setLoading(false);
         return;
     };
@@ -52,7 +55,7 @@ export default function App() {
   }, []);
 
   // --- Render a message if Firebase is not configured ---
-  if (!app) {
+  if (!db) {
       return (
           <div style={styles.errorContainer}>
               <h1>Configuration Error</h1>
